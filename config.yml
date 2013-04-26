@@ -3,7 +3,19 @@
 #------------------------------------------------------------------------------
 # This file contains configuration settings for the Bukkit plugin: CleverNotch!
 #
-# Currently the only option is to change the name of the bot that the player
-# must address in order to receive a response from Cleverbot.
+# botName
+#    - Set the name of your bot! By default it is Notch. If you change the name
+#      then you must address the bot by it's new name to receive a response!
+# botcolor
+#    - Set the color of your bot's name in chat! By default it is Yellow. This
+#      accepts all standard Minecraft chat colors: Black, DarkBlue, DarkGreen,
+#      DarkAqua, DarkRed, DarkPurple, Gold, Gray, DarkGray, Blue, Green, Aqua,
+#      Red, LightPurple, Yellow, White
+# minResponseDelay
+#    - Set the minimum number of seconds that must pass before the bot's answer
+#      is displayed to the server. This can help improve realism, but can back
+#      up the message queue to the bot. Default is 3 seconds.
 #==============================================================================
 botName: Notch
+botColor: Yellow
+minResponseDelay: 3

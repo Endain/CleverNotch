@@ -24,6 +24,9 @@ public class CleverNotch extends JavaPlugin implements Listener {
 	protected LinkedList<String> messages;
 	private boolean enabled;
 	protected String botName;
+	protected ChatColor botColor;
+	protected int minResponseDelay;
+	protected long talkTick;
 	
 	@Override
 	public void onEnable() {
@@ -43,6 +46,8 @@ public class CleverNotch extends JavaPlugin implements Listener {
 		messages = new LinkedList<String>();
 		enabled = true;
 		botName = getConfig().getString("botName");
+		botColor = getColor(getConfig().getString("botColor"));
+		minResponseDelay = getConfig().getInt("minResponseDelay");
 		// Register commands
 		getCommand("clevernotch").setExecutor(this);
 		// Register events
@@ -62,9 +67,9 @@ public class CleverNotch extends JavaPlugin implements Listener {
 				enabled = !enabled;
 				// Notify of the new status
 				if(enabled)
-					sender.sendMessage(ChatColor.YELLOW + "CleverNotch is now " + ChatColor.GREEN + "ON.");
+					sender.sendMessage(ChatColor.YELLOW + "CleverNotch is now " + ChatColor.GREEN + "ON");
 				else
-					sender.sendMessage(ChatColor.YELLOW + "CleverNotch is now " + ChatColor.RED + "OFF.");
+					sender.sendMessage(ChatColor.YELLOW + "CleverNotch is now " + ChatColor.RED + "OFF");
 			} else {
 				// Notify that the user must be an OP
 				sender.sendMessage(ChatColor.RED + "Only OPs can toggle CleverNotch.");
@@ -80,9 +85,20 @@ public class CleverNotch extends JavaPlugin implements Listener {
 		if(enabled) {
 			if(event.getMessage().length() > botName.length()) {
 				if(event.getMessage().substring(0, botName.length()).equalsIgnoreCase(botName)) {
-					messages.push(cleanMessage(event.getMessage()));
+					String clean = cleanMessage(event.getMessage());
+					// Do some very, very basic spam prevention
+					for(String msg : messages) {
+						if(msg.equalsIgnoreCase(clean)) {
+							event.setCancelled(true);
+							return;
+						}
+					}
+					// Add the clean message to the queue and modify the chat message
+					messages.push(clean);
+					event.setMessage(clean);
 					// Schedule a bot query if this is the only message in the queue
 					if(messages.size() == 1) {
+						talkTick = getServer().getWorlds().get(0).getFullTime() + (minResponseDelay * 20);
 						getServer().getScheduler().runTaskAsynchronously(this, new Think(this, messages.poll()));
 					}
 				}
@@ -100,6 +116,43 @@ public class CleverNotch extends JavaPlugin implements Listener {
 			msg = msg.substring(1);
 		// Return the cleaned message
 		return msg;
+	}
+	
+	private ChatColor getColor(String color) {
+		if(color.equalsIgnoreCase("Black"))
+			return ChatColor.BLACK;
+		else if(color.equalsIgnoreCase("DarkBlue"))
+			return ChatColor.DARK_BLUE;
+		else if(color.equalsIgnoreCase("DarkGreen"))
+			return ChatColor.DARK_GREEN;
+		else if(color.equalsIgnoreCase("DarkAqua"))
+			return ChatColor.DARK_AQUA;
+		else if(color.equalsIgnoreCase("DarkRed"))
+			return ChatColor.DARK_RED;
+		else if(color.equalsIgnoreCase("DarkPurple"))
+			return ChatColor.DARK_PURPLE;
+		else if(color.equalsIgnoreCase("Gold"))
+			return ChatColor.GOLD;
+		else if(color.equalsIgnoreCase("Gray"))
+			return ChatColor.GRAY;
+		else if(color.equalsIgnoreCase("DarkGray"))
+			return ChatColor.DARK_GRAY;
+		else if(color.equalsIgnoreCase("Blue"))
+			return ChatColor.BLUE;
+		else if(color.equalsIgnoreCase("Green"))
+			return ChatColor.GREEN;
+		else if(color.equalsIgnoreCase("Aqua"))
+			return ChatColor.AQUA;
+		else if(color.equalsIgnoreCase("Red"))
+			return ChatColor.RED;
+		else if(color.equalsIgnoreCase("LightPurple"))
+			return ChatColor.LIGHT_PURPLE;
+		else if(color.equalsIgnoreCase("Yellow"))
+			return ChatColor.YELLOW;
+		else if(color.equalsIgnoreCase("White"))
+			return ChatColor.WHITE;
+		// Default to magic for a bit-o-fun on improper configuration
+		return ChatColor.MAGIC;
 	}
 	
 	private class Think implements Runnable {
@@ -127,7 +180,10 @@ public class CleverNotch extends JavaPlugin implements Listener {
 				index = response.toLowerCase().indexOf("cleverbot");
 			}
 			// Schedule the response to be relayed
-			cn.getServer().getScheduler().runTask(cn, new Talk(cn, response));
+			long delay = cn.talkTick - cn.getServer().getWorlds().get(0).getFullTime();
+			if(delay < 0)
+				delay = 0;
+			cn.getServer().getScheduler().runTaskLater(cn, new Talk(cn, response), delay);
 		}
 		
 	}
@@ -144,7 +200,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 		@Override
 		public void run() {
 			// Send the response to all players
-			cn.getServer().broadcastMessage(ChatColor.YELLOW + cn.botName + ChatColor.WHITE + ": " + msg);
+			cn.getServer().broadcastMessage("<" + cn.botColor + cn.botName + ChatColor.WHITE + "> " + msg);
 			// If there are more messages in the queue, process another one
 			if(cn.messages.size() > 0)
 				cn.getServer().getScheduler().runTaskAsynchronously(cn, new Think(cn, cn.messages.poll()));
