@@ -1,0 +1,9 @@
+#==============================================================================
+#                       CLEVERNOTCH CONFIGURATION FILE
+#------------------------------------------------------------------------------
+# This file contains configuration settings for the Bukkit plugin: CleverNotch!
+#
+# Currently the only option is to change the name of the bot that the player
+# must address in order to receive a response from Cleverbot.
+#==============================================================================
+botName: Notch

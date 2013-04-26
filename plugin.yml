@@ -1,0 +1,7 @@
+name: CleverNotch
+main: org.dotGaming.Endain.CleverNotch.CleverNotch
+version: 1
+commands:
+   clevernotch:
+      description: Toggle the CleverNotch plugin between ON and OFF!
+      usage: /<command>
