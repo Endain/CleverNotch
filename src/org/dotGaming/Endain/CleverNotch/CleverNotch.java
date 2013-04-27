@@ -48,6 +48,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 		botName = getConfig().getString("botName");
 		botColor = getColor(getConfig().getString("botColor"));
 		minResponseDelay = getConfig().getInt("minResponseDelay");
+		talkTick = 0;
 		// Register commands
 		getCommand("clevernotch").setExecutor(this);
 		// Register events
@@ -97,7 +98,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 					messages.push(clean);
 					event.setMessage(clean);
 					// Schedule a bot query if this is the only message in the queue
-					if(messages.size() == 1) {
+					if(messages.size() == 1 && getServer().getWorlds().get(0).getFullTime() > talkTick ) {
 						talkTick = getServer().getWorlds().get(0).getFullTime() + (minResponseDelay * 20);
 						getServer().getScheduler().runTaskAsynchronously(this, new Think(this, messages.poll()));
 					}
@@ -119,6 +120,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 	}
 	
 	private ChatColor getColor(String color) {
+		// Return a chatColor from a color string
 		if(color.equalsIgnoreCase("Black"))
 			return ChatColor.BLACK;
 		else if(color.equalsIgnoreCase("DarkBlue"))
