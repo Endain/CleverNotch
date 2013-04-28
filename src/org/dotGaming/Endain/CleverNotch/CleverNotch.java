@@ -1,3 +1,20 @@
+/*
+ *  CleverNotch. A Minecraft plugin to interface with online chat bots!
+ *  Copyright (C) 2013 Endain
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.dotGaming.Endain.CleverNotch;
 
 import java.util.LinkedList;
@@ -25,6 +42,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 	private boolean enabled;
 	protected String botName;
 	protected ChatColor botColor;
+	private String botSource;
 	protected int minResponseDelay;
 	protected long talkTick;
 	
@@ -32,23 +50,39 @@ public class CleverNotch extends JavaPlugin implements Listener {
 	public void onEnable() {
 		// Verify config file exists, create it if not
 		saveDefaultConfig();
+		// Initialize variables and objects
+		messages = new LinkedList<String>();
+		enabled = true;
+		botName = getConfig().getString("botName");
+		botColor = getColor(getConfig().getString("botColor"));
+		botSource = getConfig().getString("botSource");
+		minResponseDelay = getConfig().getInt("minResponseDelay");
+		talkTick = getServer().getWorlds().get(0).getFullTime();
+		// Verify parameters from config file are valid
+		if(botName.length() > 20)
+			botName = botName.substring(0, 20);
+		if(minResponseDelay < 2)
+			minResponseDelay = 2;
+		if(minResponseDelay > 60)
+			minResponseDelay = 60;
 		// Set up Cleverbot related objects
 		try {
 			cbf = new ChatterBotFactory();
-			cb = cbf.create(ChatterBotType.CLEVERBOT);
+			// Pick a bot based on the AI source. Default to PandoraBots.
+			if(botSource.equalsIgnoreCase("cleverbot"))
+				cb = cbf.create(ChatterBotType.CLEVERBOT);
+			else if(botSource.equalsIgnoreCase("pandorabots"))
+				cb = cbf.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
+			else if(botSource.equalsIgnoreCase("jabberwacky"))
+				cb = cbf.create(ChatterBotType.JABBERWACKY);
+			else
+				cb = cbf.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
 			bot = cb.createSession();
 		} catch(Exception e) {
 			// There was an error setting up the bot, stop the plugin
 			getLogger().severe("CleverNotch could not initialize! It will be shut down!");
 			getServer().getPluginManager().disablePlugin(this);
 		}
-		// Initialize other variables and objects
-		messages = new LinkedList<String>();
-		enabled = true;
-		botName = getConfig().getString("botName");
-		botColor = getColor(getConfig().getString("botColor"));
-		minResponseDelay = getConfig().getInt("minResponseDelay");
-		talkTick = 0;
 		// Register commands
 		getCommand("clevernotch").setExecutor(this);
 		// Register events
@@ -90,6 +124,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 					// Do some very, very basic spam prevention
 					for(String msg : messages) {
 						if(msg.equalsIgnoreCase(clean)) {
+							event.getPlayer().sendMessage(ChatColor.RED + "Please do not spam " + botColor + botName + ChatColor.RED + "!");
 							event.setCancelled(true);
 							return;
 						}
@@ -100,7 +135,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 					// Schedule a bot query if this is the only message in the queue
 					if(messages.size() == 1 && getServer().getWorlds().get(0).getFullTime() > talkTick ) {
 						talkTick = getServer().getWorlds().get(0).getFullTime() + (minResponseDelay * 20);
-						getServer().getScheduler().runTaskAsynchronously(this, new Think(this, messages.poll()));
+						getServer().getScheduler().runTaskAsynchronously(this, new Think(this, messages.peek()));
 					}
 				}
 			}
@@ -203,9 +238,13 @@ public class CleverNotch extends JavaPlugin implements Listener {
 		public void run() {
 			// Send the response to all players
 			cn.getServer().broadcastMessage("<" + cn.botColor + cn.botName + ChatColor.WHITE + "> " + msg);
+			// Poll the queue to mark the input as finished
+			cn.messages.poll();
 			// If there are more messages in the queue, process another one
-			if(cn.messages.size() > 0)
+			if(cn.messages.size() > 0) {
+				cn.talkTick = getServer().getWorlds().get(0).getFullTime() + (cn.minResponseDelay * 20);
 				cn.getServer().getScheduler().runTaskAsynchronously(cn, new Think(cn, cn.messages.poll()));
+			}
 		}
 		
 	}

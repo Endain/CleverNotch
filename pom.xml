@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dotGaming.Endain.CleverNotch</groupId>
    <artifactId>CleverNotch</artifactId>
-   <version>1.0-SNAPSHOT</version>
+   <version>1.0-RELEASE</version>
    <name>CleverNotch</name>
    <url>https://github.com/Endain/CleverNotch</url>
    <issueManagement>

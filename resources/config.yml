@@ -6,16 +6,23 @@
 # botName
 #    - Set the name of your bot! By default it is Notch. If you change the name
 #      then you must address the bot by it's new name to receive a response!
-# botcolor
+#    - Name must be 20 characters of less.
+# botColor
 #    - Set the color of your bot's name in chat! By default it is Yellow. This
 #      accepts all standard Minecraft chat colors: Black, DarkBlue, DarkGreen,
 #      DarkAqua, DarkRed, DarkPurple, Gold, Gray, DarkGray, Blue, Green, Aqua,
 #      Red, LightPurple, Yellow, White
+# botSource
+#    - Set the source of the chat bot AI. Set to CleverBot by default. All bot
+#      options are: Cleverbot, JabberWacky, PandoraBots. If an invalid bot is
+#      selected then it will use PandoraBots as it's source.
 # minResponseDelay
 #    - Set the minimum number of seconds that must pass before the bot's answer
 #      is displayed to the server. This can help improve realism, but can back
 #      up the message queue to the bot. Default is 3 seconds.
+#    - Delay must be between 2 and 60 seconds.
 #==============================================================================
 botName: Notch
 botColor: Yellow
+botSource: Cleverbot
 minResponseDelay: 3
