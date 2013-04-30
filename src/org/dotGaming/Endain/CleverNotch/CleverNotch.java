@@ -68,10 +68,13 @@ public class CleverNotch extends JavaPlugin implements Listener {
 		// Set up Cleverbot related objects
 		try {
 			cbf = new ChatterBotFactory();
-			// Pick a bot based on the AI source. Default to PandoraBots.
-			if(botSource.equalsIgnoreCase("cleverbot"))
-				cb = cbf.create(ChatterBotType.CLEVERBOT);
-			else if(botSource.equalsIgnoreCase("pandorabots"))
+			// Pick a bot based on the AI source. Default to PandoraBots if invalid selection.
+			
+			// Cleverbot disabled for now! Legal issues need to be resolved!
+			//if(botSource.equalsIgnoreCase("cleverbot"))
+			//	cb = cbf.create(ChatterBotType.CLEVERBOT);
+			
+			if(botSource.equalsIgnoreCase("pandorabots"))
 				cb = cbf.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
 			else if(botSource.equalsIgnoreCase("jabberwacky"))
 				cb = cbf.create(ChatterBotType.JABBERWACKY);

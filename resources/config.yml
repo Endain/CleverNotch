@@ -13,9 +13,10 @@
 #      DarkAqua, DarkRed, DarkPurple, Gold, Gray, DarkGray, Blue, Green, Aqua,
 #      Red, LightPurple, Yellow, White
 # botSource
-#    - Set the source of the chat bot AI. Set to CleverBot by default. All bot
-#      options are: Cleverbot, JabberWacky, PandoraBots. If an invalid bot is
-#      selected then it will use PandoraBots as it's source.
+#    - Set the source of the chat bot AI. Set to Jabberwacky by default. The
+#      current options are: JabberWacky, PandoraBots. (Cleverbot was removed
+#      until further notice due to legal issues) If an invalid bot is selected
+#      then it will use PandoraBots as it's source.
 # minResponseDelay
 #    - Set the minimum number of seconds that must pass before the bot's answer
 #      is displayed to the server. This can help improve realism, but can back
@@ -24,5 +25,5 @@
 #==============================================================================
 botName: Notch
 botColor: Yellow
-botSource: Cleverbot
+botSource: Jabberwacky
 minResponseDelay: 3
