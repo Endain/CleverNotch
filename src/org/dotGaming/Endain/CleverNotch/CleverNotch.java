@@ -31,7 +31,6 @@ import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotType;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageHandler;
 import org.bukkit.Bukkit;
 
 public class CleverNotch extends JavaPlugin implements Listener {
