@@ -11,11 +11,11 @@ public class CleverEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private String msg;
-    private String format;
-    private String bukkitFormat;
+    private String botName;
 
-    protected CleverEvent(String msg) {
+    protected CleverEvent(String msg, String botName) {
         this.msg = msg;
+        this.botName = botName;
     }
 
     public String getMessage() {
@@ -26,20 +26,12 @@ public class CleverEvent extends Event {
         this.msg = msg;
     }
 
-    public String getFormat() {
-        return this.format;
+    public String getName() {
+        return this.botName;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    public String getBukkitFormat() {
-        return this.bukkitFormat;
-    }
-
-    public void setBukkitFormat(String bukkitFormat) {
-        this.bukkitFormat = bukkitFormat;
+    public void setName(String botName) {
+        this.botName = botName;
     }
 
     @Override

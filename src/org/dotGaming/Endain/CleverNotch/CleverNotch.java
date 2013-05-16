@@ -253,8 +253,9 @@ public class CleverNotch extends JavaPlugin implements Listener {
             // Send the response to all players
             cn.getServer().broadcastMessage("<" + cn.botColor + cn.botName + ChatColor.WHITE + "> " + msg);
             // Throw an event
-            CleverEvent cleverEvent = throwCleverEvent(msg.toString());
-            cleverEvent.setMessage(msg);
+            CleverEvent cleverEvent = throwCleverEvent(msg.toString(),botName);
+            cleverEvent.setMessage(msg.toString());
+            cleverEvent.setName(botName);
             // Poll the queue to mark the input as finished
             cn.messages.poll();
             // If there are more messages in the queue, process another one
@@ -265,8 +266,8 @@ public class CleverNotch extends JavaPlugin implements Listener {
         }
     }
 
-    public static CleverEvent throwCleverEvent(String msg) {
-        CleverEvent event = new CleverEvent(msg);
+    public static CleverEvent throwCleverEvent(String msg, String name) {
+        CleverEvent event = new CleverEvent(msg,name);
         Bukkit.getPluginManager().callEvent(event);
         return event;
     }
