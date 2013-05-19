@@ -19,11 +19,13 @@ A default configuration file will be generated for you the first time the plugin
 The configuration file contains details of the various options.
 A quick list of configurable features can be found below:
 * botName - Sets the name that your bot responds to.
-* botColor - Set the color of the bot's name in chat.
+* chatStyle - Set the colors and formatting of the bot's tag in chat.
+* trigger - Set the trigger that the bot will respond to.
 * botSource - Selects the bot AI source.
 * minResponseDelay - Set the minimum time that must pass before the bot will respond.
 
 ## Download
+* CleverNotch-1.1-RELEASE [Download](http://dev.bukkit.org/server-mods/clevernotch/files) [Github](https://github.com/Endain/CleverNotch)
 * CleverNotch-1.0-RELEASE [Download](http://dev.bukkit.org/server-mods/clevernotch/files) [Github](https://github.com/Endain/CleverNotch)
 
 ## Future Plans
