@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dotGaming.Endain.CleverNotch</groupId>
    <artifactId>CleverNotch</artifactId>
-   <version>1.0-RELEASE</version>
+   <version>1.1-RELEASE</version>
    <name>CleverNotch</name>
    <url>https://github.com/Endain/CleverNotch</url>
    <issueManagement>
@@ -68,7 +68,7 @@
                   <configuration>
                      <artifactSet>
                         <includes>
-                           <include>ChatterBot:ChatterBotAPI</include>
+                           <include>com.google.code:chatterbotapi</include>
                         </includes>
                      </artifactSet>
                   </configuration>
@@ -95,12 +95,12 @@
          <scope>compile</scope>
       </dependency>
       <dependency>
-         <groupId>ChatterBot</groupId>
-         <artifactId>ChatterBotAPI</artifactId>
-         <version>1.2.1</version>
-         <type>jar</type>
-         <scope>compile</scope>
-      </dependency>
+		 <groupId>com.google.code</groupId>
+		 <artifactId>chatterbotapi</artifactId>
+		 <version>1.2.1</version>
+		 <type>jar</type>
+		 <scope>compile</scope>
+	  </dependency>
    </dependencies>
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

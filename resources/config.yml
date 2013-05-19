@@ -7,11 +7,21 @@
 #    - Set the name of your bot! By default it is Notch. If you change the name
 #      then you must address the bot by it's new name to receive a response!
 #    - Name must be 20 characters of less.
-# botColor
-#    - Set the color of your bot's name in chat! By default it is Yellow. This
-#      accepts all standard Minecraft chat colors: Black, DarkBlue, DarkGreen,
-#      DarkAqua, DarkRed, DarkPurple, Gold, Gray, DarkGray, Blue, Green, Aqua,
-#      Red, LightPurple, Yellow, White
+# chatStyle
+#    - Set the prefix for the bot's chat. This allows for customization of
+#      colors and bracket styles for when the bot responds. This strign sets
+#      colors using the standard MC color tags. You can view these tags and
+#      their corresponding colors here: http://ess.khhq.net/mc/
+#      The '{botName}' part will be replaced by the bot's name set above.
+#      Default value: &f<&e{botName}&f>  (Yellow name with white brackets)
+#      MUST SURROUND STRING WITH SINGLE QUOTES: 'stuff'
+# trigger
+#    - Set the trigger for the bot to respond to. The plugin will search for
+#      this string at the start of a player's message. The default is simply
+#      {botName}, which will make the bot respond when addressed. However, you
+#      could change it to !{botName} to force the bot only to respond when
+#      it's name is preceded by !.
+#      MUST SURROUND STRING WITH SINGLE QUOTES: 'stuff'
 # botSource
 #    - Set the source of the chat bot AI. Set to Jabberwacky by default. The
 #      current options are: JabberWacky, PandoraBots. (Cleverbot was removed
@@ -24,6 +34,7 @@
 #    - Delay must be between 2 and 60 seconds.
 #==============================================================================
 botName: Notch
-botColor: Yellow
+chatStyle: '&f<&e{botName}&f>'
+trigger: '{botName}'
 botSource: Jabberwacky
 minResponseDelay: 3

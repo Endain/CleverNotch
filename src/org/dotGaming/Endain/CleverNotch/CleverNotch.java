@@ -14,9 +14,12 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  
+ *  SPECIAL THANKS: cnaude (For purpleIRC support)
  */
 package org.dotGaming.Endain.CleverNotch;
 
+import java.io.File;
 import java.util.LinkedList;
 
 import org.bukkit.ChatColor;
@@ -35,55 +38,40 @@ import org.bukkit.Bukkit;
 
 public class CleverNotch extends JavaPlugin implements Listener {
     // Cleverbot related classes, courtesy Chatter-Bot-API
-
     private ChatterBotFactory cbf;
     private ChatterBot cb;
-    protected ChatterBotSession bot;
+    private ChatterBotSession bot;
     // Chatting and queuing variables
-    protected LinkedList<String> messages;
+    private LinkedList<String> messages;
     private boolean enabled;
-    protected String botName;
-    protected ChatColor botColor;
-    private String botSource;
-    protected int minResponseDelay;
-    protected long talkTick;
+    private long talkTick;
+    // Config file class
+    private CleverConfig config;
 
     @Override
     public void onEnable() {
         // Verify config file exists, create it if not
-        saveDefaultConfig();
+    	if(!(new File(this.getDataFolder(), "config.yml")).exists())
+    		saveDefaultConfig();
+        
         // Initialize variables and objects
         messages = new LinkedList<String>();
         enabled = true;
-        botName = getConfig().getString("botName");
-        botColor = getColor(getConfig().getString("botColor"));
-        botSource = getConfig().getString("botSource");
-        minResponseDelay = getConfig().getInt("minResponseDelay");
-        talkTick = getServer().getWorlds().get(0).getFullTime();
-        // Verify parameters from config file are valid
-        if (botName.length() > 20) {
-            botName = botName.substring(0, 20);
-        }
-        if (minResponseDelay < 2) {
-            minResponseDelay = 2;
-        }
-        if (minResponseDelay > 60) {
-            minResponseDelay = 60;
-        }
+        
+        // Load up the config
+        config = new CleverConfig(this);
+        
         // Set up Cleverbot related objects
         try {
             cbf = new ChatterBotFactory();
             // Pick a bot based on the AI source. Default to PandoraBots if invalid selection.
-
             // Cleverbot disabled for now! Legal issues need to be resolved!
-            //if(botSource.equalsIgnoreCase("cleverbot"))
-            //	cb = cbf.create(ChatterBotType.CLEVERBOT);
-
-            if (botSource.equalsIgnoreCase("pandorabots")) {
+            if (config.getBotSource().equalsIgnoreCase("pandorabots")) {
                 cb = cbf.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
-            } else if (botSource.equalsIgnoreCase("jabberwacky")) {
+            } else if (config.getBotSource().equalsIgnoreCase("jabberwacky")) {
                 cb = cbf.create(ChatterBotType.JABBERWACKY);
             } else {
+            	getLogger().info("Invalid bot source specified, defaulting to PandoraBots!");
                 cb = cbf.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
             }
             bot = cb.createSession();
@@ -92,8 +80,10 @@ public class CleverNotch extends JavaPlugin implements Listener {
             getLogger().severe("CleverNotch could not initialize! It will be shut down!");
             getServer().getPluginManager().disablePlugin(this);
         }
+        
         // Register commands
         getCommand("clevernotch").setExecutor(this);
+        
         // Register events
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -128,13 +118,13 @@ public class CleverNotch extends JavaPlugin implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         // Check for a message sent to CleverNotch
         if (enabled) {
-            if (event.getMessage().length() > botName.length()) {
-                if (event.getMessage().substring(0, botName.length()).equalsIgnoreCase(botName)) {
+            if (event.getMessage().length() > config.getTrigger().length()) {
+                if (event.getMessage().substring(0, config.getTrigger().length()).equalsIgnoreCase(config.getTrigger())) {
                     String clean = cleanMessage(event.getMessage());
                     // Do some very, very basic spam prevention
                     for (String msg : messages) {
                         if (msg.equalsIgnoreCase(clean)) {
-                            event.getPlayer().sendMessage(ChatColor.RED + "Please do not spam " + botColor + botName + ChatColor.RED + "!");
+                            event.getPlayer().sendMessage(ChatColor.RED + "Please do not spam " + config.getBotName() + "!");
                             event.setCancelled(true);
                             return;
                         }
@@ -144,7 +134,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
                     event.setMessage(clean);
                     // Schedule a bot query if this is the only message in the queue
                     if (messages.size() == 1 && getServer().getWorlds().get(0).getFullTime() > talkTick) {
-                        talkTick = getServer().getWorlds().get(0).getFullTime() + (minResponseDelay * 20);
+                        talkTick = getServer().getWorlds().get(0).getFullTime() + (config.getMinResponseDelay() * 20);
                         getServer().getScheduler().runTaskAsynchronously(this, new Think(this, messages.peek()));
                     }
                 }
@@ -154,7 +144,7 @@ public class CleverNotch extends JavaPlugin implements Listener {
 
     private String cleanMessage(String msg) {
         // Strip botname from string
-        msg = msg.substring(botName.length());
+        msg = msg.substring(config.getTrigger().length());
         // Trim off any whitespace
         msg = msg.trim();
         // Strip remaining whitspace and punctuation
@@ -163,45 +153,6 @@ public class CleverNotch extends JavaPlugin implements Listener {
         }
         // Return the cleaned message
         return msg;
-    }
-
-    private ChatColor getColor(String color) {
-        // Return a chatColor from a color string
-        if (color.equalsIgnoreCase("Black")) {
-            return ChatColor.BLACK;
-        } else if (color.equalsIgnoreCase("DarkBlue")) {
-            return ChatColor.DARK_BLUE;
-        } else if (color.equalsIgnoreCase("DarkGreen")) {
-            return ChatColor.DARK_GREEN;
-        } else if (color.equalsIgnoreCase("DarkAqua")) {
-            return ChatColor.DARK_AQUA;
-        } else if (color.equalsIgnoreCase("DarkRed")) {
-            return ChatColor.DARK_RED;
-        } else if (color.equalsIgnoreCase("DarkPurple")) {
-            return ChatColor.DARK_PURPLE;
-        } else if (color.equalsIgnoreCase("Gold")) {
-            return ChatColor.GOLD;
-        } else if (color.equalsIgnoreCase("Gray")) {
-            return ChatColor.GRAY;
-        } else if (color.equalsIgnoreCase("DarkGray")) {
-            return ChatColor.DARK_GRAY;
-        } else if (color.equalsIgnoreCase("Blue")) {
-            return ChatColor.BLUE;
-        } else if (color.equalsIgnoreCase("Green")) {
-            return ChatColor.GREEN;
-        } else if (color.equalsIgnoreCase("Aqua")) {
-            return ChatColor.AQUA;
-        } else if (color.equalsIgnoreCase("Red")) {
-            return ChatColor.RED;
-        } else if (color.equalsIgnoreCase("LightPurple")) {
-            return ChatColor.LIGHT_PURPLE;
-        } else if (color.equalsIgnoreCase("Yellow")) {
-            return ChatColor.YELLOW;
-        } else if (color.equalsIgnoreCase("White")) {
-            return ChatColor.WHITE;
-        }
-        // Default to magic for a bit-o-fun on improper configuration
-        return ChatColor.MAGIC;
     }
 
     private class Think implements Runnable {
@@ -216,18 +167,12 @@ public class CleverNotch extends JavaPlugin implements Listener {
 
         @Override
         public void run() {
-            // Query Cleverbot for a response
+            // Query out bot for a response
             String response = null;
             try {
                 response = cn.bot.think(msg);
             } catch (Exception e) {
-                cn.getLogger().info("Error querying Cleverbot, no response will be given!");
-            }
-            // Replace any reference to Cleverbot with our selected name
-            int index = response.toLowerCase().indexOf("cleverbot");
-            while (index > -1) {
-                response = response.substring(0, index) + cn.botName + response.substring(index + 9);
-                index = response.toLowerCase().indexOf("cleverbot");
+                cn.getLogger().info("Error querying the bot, no response will be given!");
             }
             // Schedule the response to be relayed
             long delay = cn.talkTick - cn.getServer().getWorlds().get(0).getFullTime();
@@ -251,23 +196,21 @@ public class CleverNotch extends JavaPlugin implements Listener {
         @Override
         public void run() {
             // Send the response to all players
-            cn.getServer().broadcastMessage("<" + cn.botColor + cn.botName + ChatColor.WHITE + "> " + msg);
+            cn.getServer().broadcastMessage(config.getChatStyle() + ChatColor.RESET + " " + msg);
             // Throw an event
-            CleverEvent cleverEvent = throwCleverEvent(msg.toString(),botName);
-            cleverEvent.setMessage(msg.toString());
-            cleverEvent.setName(botName);
+            throwCleverEvent(msg.toString(), config.getBotName());
             // Poll the queue to mark the input as finished
             cn.messages.poll();
             // If there are more messages in the queue, process another one
             if (cn.messages.size() > 0) {
-                cn.talkTick = getServer().getWorlds().get(0).getFullTime() + (cn.minResponseDelay * 20);
+                cn.talkTick = getServer().getWorlds().get(0).getFullTime() + (config.getMinResponseDelay() * 20);
                 cn.getServer().getScheduler().runTaskAsynchronously(cn, new Think(cn, cn.messages.poll()));
             }
         }
     }
 
     public static CleverEvent throwCleverEvent(String msg, String name) {
-        CleverEvent event = new CleverEvent(msg,name);
+        CleverEvent event = new CleverEvent(msg, name);
         Bukkit.getPluginManager().callEvent(event);
         return event;
     }
